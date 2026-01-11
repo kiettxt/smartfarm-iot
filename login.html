@@ -13,6 +13,27 @@
         button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s; }
         button:hover { background: #219150; }
         #error-msg { color: #e74c3c; font-size: 14px; margin-top: 10px; display: none; }
+        /* Responsive cho điện thoại */
+        @media (max-width: 480px) {
+            .login-card {
+                width: 90%;        /* Chiếm 90% chiều ngang màn hình */
+                padding: 30px 20px; /* Giảm khoảng cách đệm */
+                border-radius: 10px;
+            }
+
+            .logo-login {
+                width: 80px;       /* Logo nhỏ lại một chút */
+            }
+
+            h2 {
+                font-size: 18px;   /* Chữ tiêu đề nhỏ lại */
+            }
+
+            input, button {
+                padding: 15px;     /* Làm nút và ô nhập to hơn để dễ bấm bằng tay */
+                font-size: 16px;   /* Tránh trình duyệt iOS tự động phóng to (zoom) */
+            }
+        }
     </style>
 </head>
 <body>
