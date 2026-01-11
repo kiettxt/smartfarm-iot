@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng Nhập Hệ Thống Nhà Kính</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 320px; text-align: center; }
+        .logo-login { width: 100px; height: auto; margin-bottom: 20px; }
+        h2 { color: #2c3e50; font-size: 20px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #27ae60; }
+        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s; }
+        button:hover { background: #219150; }
+        #error-msg { color: #e74c3c; font-size: 14px; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <img src="anh/logotruong.png" class="logo-login" alt="Logo Trường">
+        <h2>HỆ THỐNG SMART FARM</h2>
+        
+        <form onsubmit="checkLogin(); return false;">
+            <input type="text" id="username" placeholder="Tên đăng nhập" required>
+            <input type="password" id="password" placeholder="Mật khẩu" required>
+            <button type="submit">ĐĂNG NHẬP</button>
+        </form>
+        
+        <p id="error-msg">Thông tin đăng nhập không chính xác!</p>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            // Kiểm tra tài khoản
+            if (user === "Smartfarm" && pass === "123456") {
+                // Lưu trạng thái đăng nhập
+                sessionStorage.setItem("isLoggedIn", "true");
+                // Chuyển hướng sang trang Main
+                window.location.href = "Main.html"; 
+            } else {
+                // Hiển thị thông báo lỗi và xóa mật khẩu cũ
+                document.getElementById('error-msg').style.display = 'block';
+                document.getElementById('password').value = "";
+            }
+        }
+    </script>
+</body>
+</html>
