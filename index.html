@@ -232,7 +232,48 @@
             font-weight: bold; /* In đậm */
             margin-bottom: 5px; /* Khoảng cách dưới chữ "Bơm" */
         }
+        .settings-container {
+            display: flex;
+            justify-content: space-between; /* Đẩy nút cài đặt sang bên phải */
+            align-items: center;
+            background-color: rgba(240, 240, 240, 0.8);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        .mode-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; /* Cho phép xuống dòng trên điện thoại nhỏ */
+            gap: 15px;
+        }
 
+        .mode-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+        }
+
+        #TTCD {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        /* Nút cài đặt cố định kích thước */
+        .settings-button {
+            flex-shrink: 0; /* Không cho phép nút này bị bóp nhỏ */
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .settings-icon {
+            width: 35px;
+            height: 35px;
+        }
         .device-status {
             display: inline-block; /* Hiển thị dưới dạng khối nội tuyến */
             width: 100px; /* Cố định chiều rộng */
@@ -240,37 +281,123 @@
             white-space: nowrap; /* Ngăn không cho chữ nhảy dòng */
         }
         /* CSS cho phần Header mới */
+        /* --- CSS HEADER CHUẨN --- */
         .header-top {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            /* Chia 3 cột: Logo(100px) - Chữ(Tự động) - Logo(100px) */
+            grid-template-columns: 100px 1fr 100px;
             align-items: center;
-            padding: 10px 20px;
-            border-bottom: 2px solid #4CAF50;
-            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-bottom: 3px solid #4CAF50;
+            gap: 10px;
+            border-radius: 8px 8px 0 0;
         }
 
         .school-logo {
-            width: 120px; /* Tùy chỉnh kích thước logo */
+            width: 100%;
+            max-width: 90px;
             height: auto;
+            justify-self: center;
         }
 
         .school-info {
             text-align: center;
-            flex: 1;
         }
 
         .school-info h2 {
-            margin: 0;
-            font-size: 18px;
+            margin: 2px 0;
+            font-size: 16px;
             color: #008000;
-            text-transform: uppercase;
+            font-weight: bold;
         }
 
-        .school-info p {
-            margin: 5px 0 0 0;
+        .khoa-text {
             font-weight: bold;
-            font-size: 14px;
             color: #333;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .sub-info {
+            grid-column: 1 / span 3; /* Ép dòng đề tài chiếm hết chiều ngang */
+            text-align: center;
+            border-top: 1px dashed #ccc;
+            margin-top: 10px;
+            padding-top: 8px;
+        }
+        .sub-info p {
+            font-style: italic;
+            font-size: 13px;
+            margin: 2px 0;
+            color: black;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .header-top {
+                /* Giới hạn logo thu nhỏ tối thiểu là 50px */
+                grid-template-columns: minmax(50px, 60px) 1fr minmax(50px, 60px);
+                padding: 10px 5px;
+                gap: 5px;
+            }
+
+            .school-logo {
+                min-width: 50px; /* Không cho nhỏ hơn 50px */
+            }
+
+            .school-info h2 {
+                font-size: 10px !important;
+                line-height: 1.2;
+            }
+
+            .khoa-text {
+                font-size: 9px !important;
+            }
+
+            .sub-info {
+                display: block !important; /* Đảm bảo luôn hiện trên mobile */
+            }
+
+            .sub-info p {
+                font-size: 9px !important;
+                line-height: 1.4;
+            }
+            .settings-container {
+                padding: 8px;
+            }
+
+            .mode-left {
+                gap: 8px; /* Thu hẹp khoảng cách các nút */
+            }
+
+            .buttonCD, .buttonDB {
+                padding: 8px 12px !important; /* Thu nhỏ nút */
+                font-size: 12px !important;
+                min-width: 80px; /* Giới hạn chiều rộng tối thiểu */
+            }
+
+            .mode-status {
+                font-size: 13px;
+            }
+
+            .settings-icon {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-top {
+                 grid-template-columns: 50px 1fr 50px;
+            }
+            .school-info h2 { font-size: 8.5px !important; }
+            .sub-info p { font-size: 8px !important; }
+            .mode-left {
+                justify-content: center;
+            }
+            .settings-container {
+                flex-direction: column; /* Trên máy quá nhỏ thì nút cài đặt xuống dưới */
+                gap: 10px;
+            }
         }
         .btn-logout {
             background: #f44336;
@@ -296,6 +423,31 @@
         .exit{
             text-align: right;
         }
+        /* --- CSS CHO ĐIỆN THOẠI (Responsive) --- */
+        /* --- CSS CHO DI ĐỘNG --- */
+        /* --- CSS Header dùng chung --- */
+        .header-top {
+            display: flex;
+            flex-wrap: wrap; /* Cho phép các thành phần xuống dòng */
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-bottom: 2px solid #4CAF50;
+            gap: 10px;
+        }
+
+        .school-logo {
+            width: 80px; /* Kích thước máy tính */
+            height: auto;
+            flex-shrink: 0;
+        }
+
+        .school-info {
+            flex: 1; /* Chiếm diện tích ở giữa */
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -303,14 +455,21 @@
     <div class="container">
         <div class="header-top">
             <img src="anh/logotruong.png" alt="Logo Trường" class="school-logo">
+
             <div class="school-info">
-                <h2>ĐẠI HỌC ĐÀ NẴNG</h2>
-                <h2>TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT</h2>
-                <p>KHOA ĐIỆN - ĐIỆN TỬ</p>
-                <p style="font-style: italic; font-size: 12px;">Đề tài: Hệ thống giám sát và điều khiển nhà kính thông minh sử dụng Lora và xử lý ảnh tại chỗ</p>
-                <p style="font-style: italic; font-size: 12px;">GVHD: T.S Trần Hoàng Vũ</p>
-                <p style="font-style: italic; font-size: 12px;">SVTH: Châu Anh Kiệt- Lê Duy Minh</p>
+                <div class="main-title">
+                    <h2>ĐẠI HỌC ĐÀ NẴNG</h2>
+                    <h2>TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT</h2>
+                    <p class="khoa-text">KHOA ĐIỆN - ĐIỆN TỬ</p>
+                </div>
+                
+                <div class="sub-info">
+                    <p>Đề tài: Hệ thống giám sát và điều khiển nhà kính thông minh sử dụng Lora và xử lý ảnh tại chỗ</p>
+                    <p>GVHD: T.S Trần Hoàng Vũ</p>
+                    <p>SVTH: Châu Anh Kiệt- Lê Duy Minh</p>
+                </div>
             </div>
+
             <img src="anh/logokhoa.png" alt="Logo Khoa" class="school-logo">
         </div>
 
@@ -320,16 +479,16 @@
                 Đăng xuất
             </button>
         </div>
-        <div class="settings-container" style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="mode-container">
-                <div>
-                    <strong>Chế độ hoạt động:</strong>
+        <div class="settings-container">
+            <div class="mode-left">
+                <div class="mode-status">
+                    <strong>Chế độ:</strong>
+                    <span id="TTCD">Auto</span>
                 </div>
-                <div id="TTCD">Auto</div>
                 <button class="buttonCD" id="NBCD">Chuyển Chế Độ</button>
-		<strong style="margin-right: 20px;"></strong> <!-- Tạo khoảng cách -->
-		<button class="buttonDB" onclick="goBack()">Dự Báo Thời Tiết</button>
+                <button class="buttonDB" onclick="goBack()">Dự Báo Thời Tiết</button>
             </div>
+
             <button class="settings-button" onclick="openPopup()">
                 <img src="https://img.icons8.com/material-rounded/50/000000/settings.png" class="settings-icon" alt="Cài đặt">
             </button>
