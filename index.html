@@ -200,14 +200,35 @@
             transition: background-color 0.3s, transform 0.2s; /* Hiệu ứng chuyển màu và phóng to */
         }
 
-            .buttonDB:hover {
-                background-color: #00FF00; /* Màu nền khi hover */
-                transform: scale(1.05); /* Phóng to nhẹ khi hover */
-            }
+        .buttonDB:hover {
+            background-color: #00FF00; /* Màu nền khi hover */
+            transform: scale(1.05); /* Phóng to nhẹ khi hover */
+        }
 
-            .buttonDB:active {
-                transform: scale(0.95); /* Thu nhỏ khi nhấn */
-            }
+        .buttonDB:active {
+            transform: scale(0.95); /* Thu nhỏ khi nhấn */
+        }
+        .auto-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0;
+        }
+
+        .btn-on {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 14px;
+        border-radius: 20px;
+        }
+
+        .btn-off {
+        background: #aaa;
+        color: white;
+        border: none;
+        padding: 5px 14px;
+        border-radius: 20px;
+        }
 
         .buttonTT {
             background-color: #4CAF50; /* Màu nền */
@@ -448,6 +469,32 @@
             text-align: center;
         }
 
+        #logList {
+            list-style: none;
+            padding: 0;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        #logList li {
+            padding: 6px 8px;
+            border-bottom: 1px dashed #ccc;
+            font-size: 14px;
+        }
+
+        #logList li:nth-child(odd) {
+            background: #f9f9f9;
+        }
+        @keyframes popup {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -488,6 +535,10 @@
                 <button class="buttonCD" id="NBCD">Chuyển Chế Độ</button>
                 <button class="buttonDB" onclick="goBack()">Dự Báo Thời Tiết</button>
             </div>
+            <div class="mode-status">
+                <strong>Hệ thống:</strong>
+                <span id="SystemStatus">---</span>
+            </div>
 
             <button class="settings-button" onclick="openPopup()">
                 <img src="https://img.icons8.com/material-rounded/50/000000/settings.png" class="settings-icon" alt="Cài đặt">
@@ -511,11 +562,11 @@
                         <div class="info-value" id="GTCongSuat">1 kW</div>
                     </div>
                 </div>
-                                <div class="info-item">
+                <div class="info-item">
                     <img src="https://img.icons8.com/color/100/electricity.png" class="info-icon" >
                     <div>
                         <div>Dòng Điện</div>
-                        <div class="info-value" id="GTLuuLuong">0 A</div>
+                        <div class="info-value" id="DongDien">0 A</div>
                     </div>
                 </div>
                 <div class="info-item">
@@ -565,7 +616,6 @@
                 </div>
             </div>
         </div>
-
         <div class="section">
             <h2>Quản Lý Thiết Bị</h2>
             <div class="device-container">
@@ -609,27 +659,75 @@
                     <img src="anh/rem.png" class="device-icon" alt="Rèm">
                     <div>
                         <div class="device-name">Rèm</div>
-                        <div class="device-status" id="TTRem">Đang sử dụng</div>
-                        <button class="buttonTT" id="TTRemm">Tắt Thiết Bị</button>
+                        <div class="device-status" id="TTRem">Đang mở</div>
+                        <button class="buttonTT" id="TTRemm">Đang đóng</button>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="section">
+            <h2>Lịch sử sự kiện</h2>
+            <select id="filterDevice">
+                <option value="ALL">-- Tất cả thiết bị --</option>
+                <option value="QUAT">Quạt</option>
+                <option value="DEN">Đèn</option>
+                <option value="BOM">Bơm</option>
+                <option value="REM">Rèm</option>
+                <option value="CHUONG">Chuông</option>
+            </select>
+            <select id="filterMode">
+                <option value="ALL">-- Tất cả chế độ --</option>
+                <option value="AUTO">AUTO</option>
+                <option value="MANUAL">MANUAL</option>
+            </select>
+            <ul id="logList"></ul>
+        </div>    
     </div>
 
     <div class="popup" id="settingsPopup">
         <div class="popup-content">
             <h2>Thông Số Cài Đặt</h2>
             <div class="input-field">
-                <label for="temperature">Nhiệt độ đặt:</label>
-                <input type="number" id="temperature" placeholder="Nhập nhiệt độ" />
+                <label>Ngưỡng quá dòng (A):</label>
+                <input type="number" step="0.01" id="overCurrent" />
+            </div>
+
+            <div class="input-field">
+                <label>Nhiệt độ(°C):</label>
+                <input type="number" id="temperature" />
             </div>
             <div class="input-field">
-                <label for="humidity">Độ ẩm đặt:</label>
-                <input type="number" id="humidity" placeholder="Nhập độ ẩm" />
+                <label>Độ ẩm (%):</label>
+                <input type="number" id="humidity" />
             </div>
+            <div class="auto-item">
+            <span>Bơm theo độ ẩm đất</span>
+            <button id="bomAuto" class="btn-off" onclick="toggleAuto('bom')">OFF</button>
+            </div>
+
+            <div class="auto-item">
+            <span>Quạt theo nhiệt độ</span>
+            <button id="quatAuto" class="btn-off" onclick="toggleAuto('quat')">OFF</button>
+            </div>
+
+            <div class="auto-item">
+            <span>Đèn khi trời tối</span>
+            <button id="denAuto" class="btn-off" onclick="toggleAuto('den')">OFF</button>
+            </div>
+
+            <div class="auto-item">
+            <span>Rèm khi mưa / tối</span>
+            <button id="remAuto" class="btn-off" onclick="toggleAuto('rem')">OFF</button>
+            </div>
+
+            <div class="auto-item">
+            <span>Chuông khi nước đầy</span>
+            <button id="chuongAuto" class="btn-off" onclick="toggleAuto('chuong')">OFF</button>
+            </div>
+
             <button class="confirmSettings" onclick="confirmSettings()">Xác Nhận</button>
             <button class="close-button" onclick="closePopup()">Đóng</button>
+
         </div>
     </div>
 
@@ -637,6 +735,7 @@
         function openPopup() {
             document.getElementById('settingsPopup').style.display = 'flex';
             loadCurrentSettings();
+            loadAutoSettings();
         }
 
         function closePopup() {
@@ -644,30 +743,34 @@
         }
 
         function loadCurrentSettings() {
-            const temperatureRef = firebase.database().ref('GiaTriDat/ND');
-            const humidityRef = firebase.database().ref('GiaTriDat/DA');
-
-            temperatureRef.once('value').then(snapshot => {
-                const currentTemperature = snapshot.val();
-                document.getElementById('temperature').value = currentTemperature || ''; // Đặt giá trị hoặc để trống nếu không có
+            firebase.database().ref('GiaTriDat/ND').once('value').then(snap => {
+                document.getElementById('temperature').value = snap.val() || '';
             });
 
-            humidityRef.once('value').then(snapshot => {
-                const currentHumidity = snapshot.val();
-                document.getElementById('humidity').value = currentHumidity || ''; // Đặt giá trị hoặc để trống nếu không có
+            firebase.database().ref('GiaTriDat/DA').once('value').then(snap => {
+                document.getElementById('humidity').value = snap.val() || '';
+            });
+
+            firebase.database().ref('CaiDat/NguongDong').once('value').then(snap => {
+                document.getElementById('overCurrent').value = snap.val() || '';
             });
         }
 
         function confirmSettings() {
-            const temperature = document.getElementById('temperature').value;
-            const humidity = document.getElementById('humidity').value;
+            const temperature = Number(document.getElementById('temperature').value);
+            const humidity = Number(document.getElementById('humidity').value);
+            const overCurrent = Number(document.getElementById('overCurrent').value);
+            firebase.database().ref('GiaTriDat').update({
+                ND: temperature,
+                DA: humidity
+            });
 
-            // Gửi giá trị mới lên Firebase
-            firebase.database().ref('GiaTriDat/ND').set(temperature);
-            firebase.database().ref('GiaTriDat/DA').set(humidity);
+            firebase.database().ref('CaiDat/NguongDong').set(overCurrent);
+
 
             closePopup();
         }
+
     </script>
 
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
@@ -698,6 +801,25 @@
         function logout() {
             sessionStorage.removeItem("isLoggedIn");
             window.location.href = "login.html";
+        }
+        function listenRemState() {
+        firebase.database().ref('ThietBi/REM').on('value', function (snapshot) {
+            const val = snapshot.val();
+            const status = document.getElementById('TTRem');
+            const btn = document.getElementById('TTRemm');
+
+            if (val === 1) {
+                status.textContent = 'Đang mở';
+                status.style.color = '#FF5733'; // đỏ
+                btn.textContent = 'Đóng Rèm';
+                btn.style.backgroundColor = '#4CAF50';
+            } else {
+                status.textContent = 'Đang đóng';
+                status.style.color = '#4CAF50'; // xanh
+                btn.textContent = 'Mở Rèm';
+                btn.style.backgroundColor = '#FF5733';
+            }
+        });
         }
         // Hàm lắng nghe sự thay đổi trạng thái thiết bị
         function listenDeviceState(deviceRefName, buttonId, statusId) {
@@ -744,15 +866,11 @@
             });
         });
         document.addEventListener("DOMContentLoaded", function () {
-            var LuuLuongRef = firebase.database().ref('CamBien/LuuLuong');
+            var DongDienRef = firebase.database().ref('CamBien/DongDien');
 
-            LuuLuongRef.on('value', function (snapshot) {
-                var LuuLuongValue = snapshot.val();
-                var LuuLuongElement = document.getElementById('GTLuuLuong');
-
-                // Cập nhật giá trị nhiệt độ trong div
-                LuuLuongElement.textContent = LuuLuongValue + ' A';
-            });
+            DongDienRef.on('value', function (snapshot) {
+            document.getElementById('DongDien').textContent = snapshot.val() + ' A';
+        });
         });
         document.addEventListener("DOMContentLoaded", function () {
             var temperatureRef = firebase.database().ref('CamBien/ND');
@@ -813,9 +931,9 @@
             var textCBMN = document.getElementById('textcbmn');
 
             if (cbmnValue === 0) {
-                textCBMN.textContent = "Cao";
-            } else if (cbmnValue === 1) {
                 textCBMN.textContent = "Thấp";
+            } else if (cbmnValue === 1) {
+                textCBMN.textContent = "Cao";
             }
         });
 
@@ -853,6 +971,46 @@
             });
         });
 
+        const autoPath = {
+        bom: 'AutoBomTheoDat',
+        quat: 'AutoQuatTheoND',
+        den: 'AutoDenTheoAS',
+        rem: 'AutoRemTheoMuaToi',
+        chuong: 'ChuongKhiNuocDay'
+        };
+
+        function toggleAuto(type) {
+        const btn = document.getElementById(type + 'Auto');
+        const isOn = btn.classList.contains('btn-on');
+
+        btn.classList.toggle('btn-on', !isOn);
+        btn.classList.toggle('btn-off', isOn);
+        btn.innerText = isOn ? 'OFF' : 'ON';
+
+        firebase.database().ref('CaiDat/' + autoPath[type])
+            .set(isOn ? 0 : 1);
+        }
+        function loadAutoSettings() {
+        firebase.database().ref('CaiDat').once('value', snap => {
+            const c = snap.val() || {};
+            setBtn('bom', c.AutoBomTheoDat);
+            setBtn('quat', c.AutoQuatTheoND);
+            setBtn('den', c.AutoDenTheoAS);
+            setBtn('rem', c.AutoRemTheoMuaToi);
+            setBtn('chuong', c.ChuongKhiNuocDay);
+        });
+        }
+
+        function setBtn(type, value) {
+        const btn = document.getElementById(type + 'Auto');
+        if (value == 1) {
+            btn.className = 'btn-on';
+            btn.innerText = 'ON';
+        } else {
+            btn.className = 'btn-off';
+            btn.innerText = 'OFF';
+        }
+        }
 
         // Gán sự kiện click cho từng nút
         function isManualMode(callback) {
@@ -893,14 +1051,30 @@
                 if (isAllowed) toggleDevice('ThietBi/REM');
             });
         });
-
+        function writeLog(device, action, detail) {
+            const now = new Date();
+            firebase.database().ref("LogSuKien").push({
+                time: now.toISOString().slice(0,19).replace("T"," "),
+                timestamp: Math.floor(now.getTime()/1000),
+                device: device,
+                action: action,
+                detail: detail,
+                mode: "MANUAL",
+                source: "WEB"
+            });
+        }
+        
         // Hàm chuyển đổi trạng thái thiết bị
         function toggleDevice(deviceRefName) {
-            var deviceRef = firebase.database().ref(deviceRefName);
-            deviceRef.once('value', function (snapshot) {
-                var currentValue = snapshot.val();
-                var newValue = (currentValue === 1) ? 0 : 1;
-                deviceRef.set(newValue);
+            const ref = firebase.database().ref(deviceRefName);
+
+            ref.once('value', snap => {
+                const val = snap.val();
+                const newVal = val === 1 ? 0 : 1;
+                ref.set(newVal);
+
+                const device = deviceRefName.split("/")[1];
+                writeLog(device, newVal ? "BẬT" : "TẮT", "Điều khiển thủ công");
             });
         }
 
@@ -909,11 +1083,183 @@
         listenDeviceState('ThietBi/QUAT', 'TTQuatt', 'TTQuat');
         listenDeviceState('ThietBi/DEN', 'TTDenn', 'TTDen');
         listenDeviceState('ThietBi/CHUONG', 'TTChuongg', 'TTChuong');
-        listenDeviceState('ThietBi/REM', 'TTRemm', 'TTRem');
+        listenRemState('ThietBi/REM', 'TTRemm', 'TTRem');
 
-    // Hàm quay lại trang chính (Main.html)
-    function goBack() {
-      window.location.href = "dashboard.html"; // Điều hướng tới trang Main.html
+        // Hàm quay lại trang chính (Main.html)
+        function goBack() {
+        window.location.href = "dashboard.html"; // Điều hướng tới trang Main.html
+        }
+        firebase.database().ref('HeThong/TrangThai').on('value', snap => {
+            const st = snap.val();
+            const el = document.getElementById('SystemStatus');
+
+            if (st === "AUTO_OK") {
+                el.textContent = "Auto hoạt động";
+                el.style.color = "green";
+            } else if (st === "MANUAL") {
+                el.textContent = "Manual";
+                el.style.color = "orange";
+            } else {
+                el.textContent = "Lỗi / Mất kết nối";
+                el.style.color = "red";
+            }
+        });
+    </script>
+    <script>
+        // ================== BIẾN GLOBAL ==================
+        let allLogs = [];
+        const logList = document.getElementById("logList");
+
+        // ================== GHI LOG ==================
+        function writeLog(device, action, detail, mode = "MANUAL") {
+            const now = new Date().toLocaleString("sv-SE"); // yyyy-mm-dd HH:mm:ss
+
+            firebase.database().ref("LogSuKien").push({
+                time: now,
+                device: device,
+                action: action,
+                detail: detail,
+                mode: mode
+            });
+        }
+
+        // ================== ĐỌC LOG 1 LẦN – CACHE ==================
+        firebase.database().ref("LogSuKien").on("value", snapshot => {
+            allLogs = [];
+            snapshot.forEach(child => {
+                allLogs.push(child.val());
+            });
+
+            // Sắp xếp mới → cũ
+            allLogs.sort((a, b) => b.time.localeCompare(a.time));
+
+            renderLogs();
+        });
+
+        // ================== RENDER + FILTER ==================
+        function renderLogs() {
+            logList.innerHTML = "";
+
+            const deviceFilter = document.getElementById("filterDevice").value;
+            const modeFilter = document.getElementById("filterMode").value;
+
+            allLogs.forEach(log => {
+                if (filterLog(log, deviceFilter, modeFilter)) {
+                    logList.innerHTML += `
+                        <li>
+                            [${log.time}] 
+                            <b>${log.device}</b> - ${log.action}: 
+                            ${log.detail} 
+                            (<span style="color:${log.mode === "AUTO" ? "blue" : "green"}">
+                                ${log.mode}
+                            </span>)
+                        </li>
+                    `;
+                }
+            });
+        }
+
+        // ================== LOGIC LỌC (CỐT LÕI) ==================
+        function filterLog(log, device, mode) {
+            if (device === "ALL" && mode === "ALL") return true;
+            if (device === "ALL") return log.mode === mode;
+            if (mode === "ALL") return log.device === device;
+            return log.device === device && log.mode === mode;
+        }
+
+        // ================== SỰ KIỆN DROPDOWN ==================
+        document.getElementById("filterDevice").addEventListener("change", renderLogs);
+        document.getElementById("filterMode").addEventListener("change", renderLogs);
+    </script>
+    <div id="overCurrentAlert" style="
+        display:none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    ">
+        <div style="
+            background: #ff4d4d;
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            text-align: center;
+            min-width: 300px;
+            animation: popup 0.3s ease;
+        ">
+            ⚠️ <b style="font-size:18px">CẢNH BÁO QUÁ DÒNG!</b><br><br>
+            Vui lòng kiểm tra hệ thống
+            <br><br>
+            <button onclick="acknowledgeOverCurrent()" style="
+                background:#fff;
+                color:#ff4d4d;
+                border:none;
+                padding:8px 16px;
+                border-radius:6px;
+                cursor:pointer;
+                font-weight:bold;
+                font-size:14px;
+            ">
+                Tôi đã kiểm tra
+            </button>
+        </div>
+    </div>
+    <script>
+    let isOverCurrent = false;
+    let isAcknowledged = false;
+
+    // Lắng nghe dòng điện
+    firebase.database().ref('CamBien/DongDien').on('value', snap => {
+        const dongDien = Number(snap.val());
+
+        firebase.database().ref('CaiDat/NguongDong').once('value', nguongSnap => {
+            const nguong = Number(nguongSnap.val());
+
+            if (dongDien > nguong) {
+                isOverCurrent = true;
+
+                // Chỉ hiện cảnh báo nếu chưa xác nhận
+                if (!isAcknowledged) {
+                    showOverCurrentAlert();
+
+                    // Ghi log 1 lần
+                    if (!window.loggedOverCurrent) {
+                        writeLog("HETHONG", "QUÁ DÒNG", 
+                            `Dòng điện ${dongDien}A vượt ngưỡng ${nguong}A`, 
+                            "AUTO");
+                        window.loggedOverCurrent = true;
+                    }
+                }
+            } else {
+                // Khi dòng trở lại bình thường → reset
+                isOverCurrent = false;
+                isAcknowledged = false;
+                window.loggedOverCurrent = false;
+                hideOverCurrentAlert();
+            }
+        });
+    });
+    function showOverCurrentAlert() {
+        document.getElementById("overCurrentAlert").style.display = "flex";
+    }
+
+    function hideOverCurrentAlert() {
+        document.getElementById("overCurrentAlert").style.display = "none";
+    }
+    function acknowledgeOverCurrent() {
+        isAcknowledged = true;
+        hideOverCurrentAlert();
+
+        writeLog(
+            "HETHONG",
+            "XÁC NHẬN",
+            "Người dùng đã kiểm tra sự cố quá dòng",
+            "MANUAL"
+        );
     }
 
     </script>
