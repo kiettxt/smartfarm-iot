@@ -1242,8 +1242,9 @@
             const nguong = Number(nguongSnap.val());
 
             if (dongDien > nguong) {
-                isOverCurrent = true;
                 forceAutoToManual();
+
+                firebase.database().ref('CanhBao/QuaDong').set(1);
 
                 firebase.database().ref('CanhBao/AckQuaDong').once('value', ackSnap => {
                     const isAck = ackSnap.val() === 1;
@@ -1262,23 +1263,13 @@
                         }
                     }
                 });
-
-                firebase.database().ref('CanhBao/QuaDong').set(1);
-            } 
-            else {
-                isOverCurrent = false;
-                window.loggedOverCurrent = false;
-
-                firebase.database().ref('CanhBao').update({
-                    QuaDong: 0,
-                    AckQuaDong: 0
-                });
-
-                hideOverCurrentAlert();
             }
+
+            // ❗ DÒNG ĐIỆN ĐÃ VỀ BÌNH THƯỜNG
+            // → KHÔNG ĐƯỢC TỰ TẮT CẢNH BÁO
+            // → CHỜ NGƯỜI DÙNG XÁC NHẬN
         });
     });
-
     function showOverCurrentAlert() {
         document.getElementById("overCurrentAlert").style.display = "flex";
     }
