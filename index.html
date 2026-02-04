@@ -1172,15 +1172,13 @@
         document.getElementById("filterMode").addEventListener("change", renderLogs);
     </script>
     <div id="overCurrentAlert" style="
-        display:none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    ">
+    display:none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;">
         <div style="
             background: #ff4d4d;
             color: white;
@@ -1289,6 +1287,15 @@
             "MANUAL"
         );
     }
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        firebase.database().ref('CanhBao/AckQuaDong').once('value', snap => {
+            if (snap.val() === 1) {
+                hideOverCurrentAlert();
+            }
+        });
+    });
     </script>
 </body>
 </html >
