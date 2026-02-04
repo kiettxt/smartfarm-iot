@@ -1209,6 +1209,28 @@
         </div>
     </div>
     <script>
+        function forceAutoToManual() {
+            const cheDoRef = firebase.database().ref('CheDo/TT');
+
+            cheDoRef.once('value', snap => {
+                if (snap.val() === "1") { // Đang AUTO
+                    cheDoRef.set("0");   // Ép về MANUAL
+
+                    firebase.database().ref('HeThong/TrangThai')
+                        .set("LOCK_OVER_CURRENT");
+
+                    writeLog(
+                        "HETHONG",
+                        "CHUYỂN CHẾ ĐỘ",
+                        "Quá dòng – hệ thống chuyển từ AUTO sang MANUAL",
+                        "AUTO"
+                    );
+                }
+            });
+        }
+        </script>
+
+    <script>
     let isOverCurrent = false;
     let isAcknowledged = false;
 
@@ -1221,28 +1243,42 @@
 
             if (dongDien > nguong) {
                 isOverCurrent = true;
+                forceAutoToManual();
 
-                // Chỉ hiện cảnh báo nếu chưa xác nhận
-                if (!isAcknowledged) {
-                    showOverCurrentAlert();
+                firebase.database().ref('CanhBao/AckQuaDong').once('value', ackSnap => {
+                    const isAck = ackSnap.val() === 1;
 
-                    // Ghi log 1 lần
-                    if (!window.loggedOverCurrent) {
-                        writeLog("HETHONG", "QUÁ DÒNG", 
-                            `Dòng điện ${dongDien}A vượt ngưỡng ${nguong}A`, 
-                            "AUTO");
-                        window.loggedOverCurrent = true;
+                    if (!isAck) {
+                        showOverCurrentAlert();
+
+                        if (!window.loggedOverCurrent) {
+                            writeLog(
+                                "HETHONG",
+                                "QUÁ DÒNG",
+                                `Dòng điện ${dongDien}A vượt ngưỡng ${nguong}A`,
+                                "AUTO"
+                            );
+                            window.loggedOverCurrent = true;
+                        }
                     }
-                }
-            } else {
-                // Khi dòng trở lại bình thường → reset
+                });
+
+                firebase.database().ref('CanhBao/QuaDong').set(1);
+            } 
+            else {
                 isOverCurrent = false;
-                isAcknowledged = false;
                 window.loggedOverCurrent = false;
+
+                firebase.database().ref('CanhBao').update({
+                    QuaDong: 0,
+                    AckQuaDong: 0
+                });
+
                 hideOverCurrentAlert();
             }
         });
     });
+
     function showOverCurrentAlert() {
         document.getElementById("overCurrentAlert").style.display = "flex";
     }
@@ -1251,7 +1287,8 @@
         document.getElementById("overCurrentAlert").style.display = "none";
     }
     function acknowledgeOverCurrent() {
-        isAcknowledged = true;
+        firebase.database().ref('CanhBao/AckQuaDong').set(1);
+        firebase.database().ref('HeThong/TrangThai').set("MANUAL");
         hideOverCurrentAlert();
 
         writeLog(
@@ -1261,7 +1298,6 @@
             "MANUAL"
         );
     }
-
     </script>
 </body>
 </html >
