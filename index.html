@@ -539,7 +539,7 @@
                 <strong>Hệ thống:</strong>
                 <span id="SystemStatus">---</span>
             </div>
-
+            <button class="buttonDB" onclick="resetLock()">RESET LOCK</button>
             <button class="settings-button" onclick="openPopup()">
                 <img src="https://img.icons8.com/material-rounded/50/000000/settings.png" class="settings-icon" alt="Cài đặt">
             </button>
@@ -1099,6 +1099,9 @@
             } else if (st === "MANUAL") {
                 el.textContent = "Manual";
                 el.style.color = "orange";
+            }else if (st === "LOCK") {
+                el.textContent = "Lock";
+                el.style.color = "orange";
             } else {
                 el.textContent = "Lỗi / Mất kết nối";
                 el.style.color = "red";
@@ -1226,7 +1229,7 @@
                 }
             });
         }
-        </script>
+    </script>
 
     <script>
     let isOverCurrent = false;
@@ -1297,5 +1300,39 @@
         });
     });
     </script>
+    <script>
+    function resetLock() {
+        if (!confirm("Xác nhận thoát LOCK và đưa hệ thống về MANUAL?")) return;
+
+        firebase.database().ref().update({
+            "CanhBao/QuaDong": 0,
+            "CheDo/TT": "0"
+        });
+
+        alert("Đã RESET LOCK. Hệ thống về MANUAL.");
+    }
+    let isLocked = false;
+
+    firebase.database().ref('HeThong/TrangThai').on('value', snap => {
+        isLocked = (snap.val() === "LOCK");
+        setButtonsDisabled(isLocked);
+    });
+
+    function setButtonsDisabled(disabled) {
+        document.querySelectorAll('.buttonTT, .buttonCD').forEach(btn => {
+            btn.disabled = disabled;
+            btn.style.opacity = disabled ? 0.5 : 1;
+        });
+    }
+    firebase.database().ref('HeThong/TrangThai').on('value', snap => {
+        if (snap.val() === "LOCK") {
+            document.getElementById("overCurrentAlert").style.display = "flex";
+        } else {
+            document.getElementById("overCurrentAlert").style.display = "none";
+        }
+    });
+
+    </script>
+
 </body>
 </html >
