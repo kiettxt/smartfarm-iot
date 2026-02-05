@@ -1280,7 +1280,6 @@
     }
     function acknowledgeOverCurrent() {
         firebase.database().ref('CanhBao/AckQuaDong').set(1);
-        firebase.database().ref('HeThong/TrangThai').set("MANUAL");
         hideOverCurrentAlert();
 
         writeLog(
